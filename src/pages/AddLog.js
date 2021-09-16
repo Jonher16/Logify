@@ -9,11 +9,12 @@ import {
   Select,
   MenuItem,
 } from "@material-ui/core";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import back from "../images/back.png";
-import {db} from "../firebase";
-import firebase from "firebase"
+import { db } from "../firebase";
+import firebase from "firebase";
+import { DataGrid } from "@mui/x-data-grid";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -40,21 +41,20 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   form: {
-    backgroundColor: "rgba(255, 255, 255,1)",
-    height: "60vh",
-    minWidth: "40vw",
-    minHeight: "65vh",
+    marginTop: "2vh",
     borderRadius: "50px",
     display: "flex",
+    minWidth: "60vw",
+    minHeight: "10vh",
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
     boxShadow:
       "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
-      transition: "transform .5s",
-      "&:target": {
-        transform: "scale(1.1)",
-      },
+    transition: "transform .5s",
+    "&:target": {
+      transform: "scale(1.1)",
+    },
   },
   back: {
     position: "absolute",
@@ -68,92 +68,79 @@ const useStyles = makeStyles((theme) => ({
       transform: "scale(1.2)",
     },
   },
-  value_line: {
-    //border: "1px solid red",
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    
-  },
-  value: {
-    width: "53%"
-  },
-  unit: {
-      width:"30%"
-  },
-  column1: {
-    //border: "1px solid red",
-    display: "flex",
-    flexDirection: "column",
-    width: "50%",
-    height: "70%",
-    padding: theme.spacing(2),
-    paddingRight: "0",
-    justifyContent: "space-around",
-    alignItems: "center",
-  },
-  column2: {
-    //border: "1px solid blue",
-    height: "70%",
-    display: "flex",
-    flexDirection: "column",
-    width: "50%",
-    padding: theme.spacing(1),
-    marginTop: "2.1vh",
-    justifyContent: "space-around",
-    alignItems: "center",
-  },
-  notes: {
-    height: "70%",
-  },
-  button: {
-    marginTop: "3vh",
-  },
-  pass_line: {
-    //border: "1px solid red",
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
 }));
 
+const columns = [
+  { field: 'measurement', headerName: 'Measurement', width: 180, editable: true },
+  { field: 'number', headerName: 'Value', width: 200, editable: true },
+];
+
+const defaultrows = [
+  {
+    id: 1,
+    measurement: "Power Test",
+    number: 7,
+  },
+  {
+    id: 2,
+    measurement: "Speed Test",
+    number: 9,
+  },
+  {
+    id: 3,
+    measurement: "Visual Test",
+    number: 3,
+  },
+];
 const AddLog = () => {
   const classes = useStyles();
-  const [log, setlog] = useState({ 
-    measurement: "",
-    value: "",
-    unit: "",
-    criteria: "",
-    pass: false,
-    notes: "",
-  })
+  const [title, setTitle] = useState("")
+  const [rows, setRows] = React.useState(defaultrows);
 
-  const submitLog = (e) => {
+  useEffect(() => {
+    console.log(rows)
+  }, [rows])
+
+  const handleCellEditCommit = React.useCallback(
+    ({ id, field, value }) => {
+      if (field === 'measurement') {
+      
+        const measurement = value
+        const updatedRows = rows.map((row) => {
+          if (row.id === id) {
+            return { ...row, measurement };
+          }
+          return row;
+        });
+        setRows(updatedRows);
+      }
+      if (field === 'number') {
+        const number = value
+        const updatedRows = rows.map((row) => {
+          if (row.id === id) {
+            return { ...row, number };
+          }
+          return row;
+        });
+        setRows(updatedRows);
+      }
+    },
+    [rows],
+  );
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (log.measurement==="" || log.criteria==="" || log.value===""|| log.unit===""|| log.notes==="" ) {
-      alert("You have to fill all fields first")
-  }
-  else {
-    db.collection("logs").add({
-      measurement: log.measurement,
-      value: log.value,
-      unit: log.unit,
-      criteria: log.criteria,
-      pass: log.pass,
-      notes: log.notes,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    db.collection("tables").add({
+      title: title,
+      columns: columns,
+      rows: rows,
     });
-    setlog({measurement: "",
-    value: "",
-    unit: "",
-    criteria: "",
-    pass: false,
-    notes: "",})
-    alert("Log added successfully")
+    db.collection("tableTitle").add({
+      title: title,
+    });
+    alert("Table submitted succesfully")
   }
-  }
+
 
   return (
     <div className={classes.root}>
@@ -163,86 +150,35 @@ const AddLog = () => {
       <div className={classes.title}>
         <Typography className={classes.title__text}>Add New Log</Typography>
       </div>
-      <form className={classes.form}>
-        <div className={classes.column1}>
-          <TextField
-          value={log.measurement}
-          onChange={(e) => {
-            setlog({ ...log, measurement: e.target.value, })}}
-            id="outlined-basic"
-            label="Measurement"
-            variant="outlined"
-          />
-          <div className={classes.value_line}>
-            <TextField
-              className={classes.value}
-              value={log.value}
-            onChange={(e) => setlog({ ...log, value: e.target.value, })}
+      
+      <div style={{ height: 400, width: '100%' }}>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        onCellEditCommit={handleCellEditCommit}
+        hideFooterSelectedRowCount
+      />
+    </div>
+    <form className={classes.form} onSubmit={handleSubmit}>
+            <TextField classname={classes.textfield}
               id="outlined-basic"
-              label="Value"
-              variant="outlined"
+              label="Table Name"
+            InputProps={{
+              style: {
+                  color: "white"
+              }
+          }}
+              variant="filled"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
-        
-            <FormControl variant="outlined" className={classes.unit}>
-              <InputLabel id="demo-simple-select-outlined-label">
-                Unit
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-outlined-label"
-                id="demo-simple-select-outlined"
-                label="Unit"
-                value={log.unit}
-            onChange={(e) => setlog({ ...log, unit: e.target.value, })}
-              >
-                <MenuItem >
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value={"in"}>in</MenuItem>
-                <MenuItem value={"ft"}>ft</MenuItem>
-                <MenuItem value={"m"}>m</MenuItem>
-              </Select>
-            </FormControl>
-          </div>
-          <TextField
-            id="outlined-basic"
-            value={log.criteria}
-            onChange={(e) => setlog({ ...log, criteria: e.target.value, })}
-            label="Acceptance Criteria"
-            variant="outlined"
-          />
-          <div className={classes.pass_line}>
-            <Typography style={{ color: "grey" }}>Pass</Typography>
-            <Checkbox
-              checked={log.pass}
-              onChange={(e) => setlog({ ...log, pass: !log.pass })}
-              color="primary"
-              inputProps={{ "aria-label": "secondary checkbox" }}
-            />
-          </div>
-        </div>
-        <div className={classes.column2}>
-          <TextField
-            id="outlined-basic"
-            className={classes.notes}
-            multiline
-            rows={8}
-            value={log.notes}
-            onChange={(e) => setlog({ ...log, notes: e.target.value, })}
-            label="Notes"
-            variant="outlined"
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            className={classes.button}
-            onClick={submitLog}
-          >
-            Submit
-          </Button>
-        </div>
-      </form>
+            <Button className={classes.button} variant="contained" color="primary" onClick={handleSubmit}>
+              Submit Table
+            </Button>
+          </form>
+
     </div>
   );
-};
+}
 
 export default AddLog;

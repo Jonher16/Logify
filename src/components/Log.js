@@ -2,6 +2,7 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Card,
   makeStyles,
   Typography,
 } from "@material-ui/core";
@@ -31,32 +32,27 @@ const useStyles = makeStyles((theme) => ({
       transform: "scale(1.2)",
     },
   },
-  accordion_details: {
-      display:"flex",
-      flexDirection: "column"
+  card: {
+    marginBottom: "1vh",
+    height: "5vh",
+    alignItems: "center",
+    transition: "transform .2s",
+    "&:hover": {
+      transform: "scale(1.05)",
+    }
+  },
+  title: {
+    marginTop: "0.8vh",
+    fontSize:"1rem",
+    marginLeft: "1vw"
   }
 }));
-const Log = forwardRef(({measurement, criteria, value, notes, pass, unit},ref) => {
+const Log = forwardRef(({title}, ref) => {
   const classes = useStyles();
   return (
-    <div>
-      <Accordion>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
-        >
-          <Typography className={classes.heading}>{measurement}</Typography>
-        </AccordionSummary>
-        <AccordionDetails className={classes.accordion_details}>
-          <Typography>Measurement: {measurement}</Typography>
-          <Typography>Criteria: {criteria}</Typography>
-          <Typography>value: {value}{unit}</Typography>
-          <Typography>pass: { pass ? "yes" : "no"}</Typography>
-          <Typography>Notes: {notes}</Typography>
-        </AccordionDetails>
-      </Accordion>
-    </div>
+      <Card className={classes.card}>
+        <Typography className={classes.title}>{title}</Typography>
+      </Card>
   )}
 )
 

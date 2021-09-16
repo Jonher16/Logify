@@ -28,42 +28,46 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": {
       transform: "scale(1.2)",
     },
-},
-    logs: {
-        //border: "1px solid red",
-        marginTop: "10vh",
-        minWidth: "70vw",
-        
+  },
+  logs: {
+    //border: "1px solid red",
+    marginTop: "10vh",
+    minWidth: "70vw",
+    display: "flex",
+    flexDirection: "column",
+    height: "60vh",
+  },
+  title: {
+    //border: "1px solid red",
+    marginTop: "10vh",
+  },
+  title__text: {
+    fontSize: "3rem",
+    fontWeight: "bold",
+    transition: "transform .5s",
+    "&:hover": {
+      transform: "scale(1.1)",
     },
-    title: {
-      //border: "1px solid red",
-      marginTop: "10vh",
-    },
-    title__text: {
-      fontSize: "3rem",
-      fontWeight: "bold",
-      transition: "transform .5s",
-      "&:hover": {
-        transform: "scale(1.1)",
-      },
-    },
+  },
 }));
 
 const Logs = () => {
   const classes = useStyles();
-  const [loglist, setloglist] = useState([])
+  const [loglist, setloglist] = useState([]);
+  
 
   useEffect(() => {
-    db.collection("logs").onSnapshot(
-      (snapshot) =>
-        setloglist(
-          snapshot.docs.map((doc) => ({
-            id: doc.id,
-            data: doc.data(),
-          }))
-        )
+    db.collection("tableTitle").onSnapshot((snapshot) =>
+      setloglist(
+        snapshot.docs.map((doc) => ({
+          id: doc.id,
+          data: doc.data(),
+        }))
+      )
     );
-  }, [loglist]);
+  }, []);
+
+
 
   return (
     <div className={classes.root}>
@@ -74,19 +78,20 @@ const Logs = () => {
         <Typography className={classes.title__text}>Logs</Typography>
       </div>
       <div className={classes.logs}>
-
-      {loglist.map(({id, data: {measurement, criteria, value, notes, pass, unit, timestamp}}) => (
-            <Log
-              key={id}
-              id={id}
-              measurement={measurement}
-              criteria={criteria}
-              value={value}
-              notes={notes}
-              pass={pass}
-              unit={unit}
-              timestamp={timestamp}
-            />
+        {loglist.map(
+          ({
+            id,
+            data: {
+              title,
+            },
+          }) => (
+            <Link to={`/logs/${title}`} style={{ textDecoration: "none"}}>
+              <Log
+                key={id}
+                id={id}
+                title={title}
+              />
+            </Link>
           )
         )}
       </div>
