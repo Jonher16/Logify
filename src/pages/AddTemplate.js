@@ -1,6 +1,6 @@
 import { Button, IconButton, makeStyles, TextField, Typography } from "@material-ui/core";
 import { DataGrid } from "@mui/x-data-grid";
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import back from "../images/back.png";
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "row",
     width: "40vw",
-    border: "1px solid red",
+    //border: "1px solid red",
     justifyContent: "space-between",
   },
   form: {
@@ -97,8 +97,13 @@ const useStyles = makeStyles((theme) => ({
   formheader: {
     color: "black",
     display: "flex",
+    width: "80%",
     alignItems: "center",
     flexDirection: "row",
+    //border: "1px solid red",
+  },
+  textfieldmargin: {
+    marginLeft: "0.35vw"
   },
   map: {
     marginTop: "2vh",
@@ -137,49 +142,80 @@ const useStyles = makeStyles((theme) => ({
 
 const defaultcolumns = [
   {
-    field: "measurement",
-    headerName: "Measurement",
+    field: " ",
+    headerName: " ",
     width: 180,
-    editable: true,
+    editable: false,
   },
 ];
 
-const defaultrows = [
-  {
-    id: 0,
-    measurement: "",
-    number: 0,
-  },
-];
 const AddTemplate = () => {
   const classes = useStyles();
   const [rows, setRows] = React.useState([]);
-  const [columns, setColumns] = React.useState([]);
+  const [columns, setColumns] = React.useState(defaultcolumns);
   const [title, setTitle] = React.useState("")
 
   const [columnName, setcolumnName] = React.useState("")
   const [rowName, setrowName] = React.useState("")
 
+    useEffect(() => {
+      console.log("columns => ", columns)
+    }, [columns])
+
   const handleSubmitRow = (e) => {
     e.preventDefault()
-    setRows([...rows, rowName])
+    if (rowName === "" || rowName.startsWith(" ") === true) {
+      setrowName("")
+      alert("Invalid row name")
+    }
+    else {
+      setRows([...rows, rowName])
+      setrowName("")
+    }
   }
+
+  const handleDeleteRow = (e, row) => {
+    e.preventDefault()
+    let filter = rows.filter(item=>(row !== item))
+    setRows(filter)
+  }
+
   const handleSubmitColumn = (e) => {
     e.preventDefault()
-    setColumns([...columns, columnName])
+    if (columnName === "" || columnName.startsWith(" ") === true) {
+      setcolumnName("")
+      alert("Invalid column name")
+    }
+    else {
+      setColumns([...columns, {field: columnName, headerName: columnName, editable: true, width: 180 }])
+    setcolumnName("")
+    }
+  }
+
+  const handleDeleteColumn= (e, column) => {
+    e.preventDefault()
+    let filter = columns.filter(item=>(column !== item))
+    setColumns(filter)
   }
 
   const handleSubmitTemplate = (e) => {
     e.preventDefault();
+    if (title === "" || title.startsWith(" ") === true) {
+      setTitle("")
+      alert("Invalid title")
+    }
+    else{
     db.collection("templates").add({
       title: title,
       columns: columns,
       rows: rows,
     });
+   
     alert("Template submitted succesfully")
     setRows([])
-    setColumns([])
+    setColumns(defaultcolumns)
     setTitle("")
+  }
   }
 
   return (
@@ -210,6 +246,7 @@ const AddTemplate = () => {
             
             <Typography>Add column:</Typography>
             <TextField
+            className={classes.textfieldmargin}
               id="outlined-basic"
               label="Column name"
               variant="outlined"
@@ -220,10 +257,10 @@ const AddTemplate = () => {
           <div className={classes.map}>
             {columns &&
               columns.map((column) => (
-                <div className={classes.mapitem}>
-                  <Typography>{column}</Typography>
+                (column.field !== " ") && <div className={classes.mapitem}>
+                  <Typography>{column.headerName}</Typography>
                   <IconButton className={classes.binicon}>
-                  <DeleteIcon />
+                  <DeleteIcon onClick={(e)=>handleDeleteColumn(e, column)}/>
                   </IconButton>
                 </div>
               ))}
@@ -233,6 +270,7 @@ const AddTemplate = () => {
           <form className={classes.formheader} onSubmit={handleSubmitRow}>
             <Typography>Add row:</Typography>
             <TextField
+            className={classes.textfieldmargin}
               id="outlined-basic"
               label="Row name"
               variant="outlined"
@@ -246,7 +284,7 @@ const AddTemplate = () => {
                 <div className={classes.mapitem}>
                   <Typography>{row}</Typography>
                   <IconButton className={classes.binicon}>
-                  <DeleteIcon />
+                  <DeleteIcon onClick={(e)=>handleDeleteRow(e, row)} />
                   </IconButton>
                 </div>
               ))}

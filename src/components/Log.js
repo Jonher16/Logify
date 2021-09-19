@@ -1,39 +1,24 @@
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Card,
+  IconButton,
   makeStyles,
   Typography,
 } from "@material-ui/core";
 import React, { forwardRef } from "react";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import DeleteIcon from "@material-ui/icons/Delete";
+import { Link } from "react-router-dom";
+import { db } from "../firebase";
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    background: "linear-gradient(0deg, #0C79F7 30%, #88BFFE 70%)",
-    color: "white",
-    height: "100vh",
-    width: "100vw",
     display: "flex",
-    flexDirection: "column",
+    flexDirection: "row",
+    width: "100%",
     alignItems: "center",
-    margin: "0",
-  },
-  back: {
-    position: "absolute",
-    zindex: 999,
-    left: 20,
-    top: 20,
-    height: "50px",
-    width: "50px",
-    transition: "transform .2s",
-    "&:hover": {
-      transform: "scale(1.2)",
-    },
   },
   card: {
-    marginBottom: "1vh",
+    width: "95%",
     height: "5vh",
     alignItems: "center",
     transition: "transform .2s",
@@ -45,14 +30,35 @@ const useStyles = makeStyles((theme) => ({
     marginTop: "0.8vh",
     fontSize:"1rem",
     marginLeft: "1vw"
-  }
+  },
+  binicon: {
+    position: "right",
+  },
 }));
-const Log = forwardRef(({title}, ref) => {
+const Log = forwardRef(({title ,id}, ref) => {
   const classes = useStyles();
+
+  const handleDeleteLog = (e) => {
+ e.preventDefault();
+ if (window.confirm("Do you want to delete the log forever?")) {
+  db.collection("tables").doc(id).delete()
+   alert("Log deleted")
+ }
+ else alert("Log was not deleted")
+  }
+
   return (
+    <div className={classes.root}>
+      <Link to={`/logs/${title}`} style={{ textDecoration: "none", width: "90%"}}>
       <Card className={classes.card}>
         <Typography className={classes.title}>{title}</Typography>
       </Card>
+      </Link>
+      <IconButton className={classes.binicon}>
+            <DeleteIcon onClick={(e)=>handleDeleteLog(e)} />
+          </IconButton>
+      </div>
+      
   )}
 )
 

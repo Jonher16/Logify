@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     minWidth: "70vw",
     display: "flex",
     flexDirection: "column",
-    height: "60vh",
+    minHeight: "60vh",
   },
   title: {
     //border: "1px solid red",
@@ -57,7 +57,7 @@ const Logs = () => {
   
 
   useEffect(() => {
-    db.collection("tableTitle").onSnapshot((snapshot) =>
+    db.collection("tables").onSnapshot((snapshot) =>
       setloglist(
         snapshot.docs.map((doc) => ({
           id: doc.id,
@@ -85,13 +85,13 @@ const Logs = () => {
               title,
             },
           }) => (
-            <Link to={`/logs/${title}`} style={{ textDecoration: "none"}}>
+            
               <Log
                 key={id}
                 id={id}
                 title={title}
               />
-            </Link>
+            
           )
         )}
       </div>
