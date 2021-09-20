@@ -1,4 +1,4 @@
-import { Button, makeStyles } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { DataGrid } from "@mui/x-data-grid";
@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
   topdiv: {
     display: "flex",
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
   },
 }));
 
@@ -124,6 +124,11 @@ const Log = () => {
   const [data, setData] = React.useState([]);
   const fileName = title; // here enter filename for your excel file
 
+  const handleCellEditCommit = React.useCallback(
+    ({ id, field, value }) => {},
+    [table]
+  );
+
   useEffect(() => {
     //console.log(table[0].data.rows.map((row) => row));
     setHeaders(
@@ -131,6 +136,8 @@ const Log = () => {
         if (column.headerName !== "id") {
           //console.log(column.headerName);
           return column.headerName;
+        } else {
+          return null;
         }
       })
     );
@@ -157,13 +164,15 @@ const Log = () => {
       </Link>
       <ExportToExcel apiData={data} fileName={fileName} headers={headers} />
       <h1>Title: {title}</h1>
-      
+
       {table ? (
         <div style={{ height: 500, width: "100%" }}>
           <DataGrid
             rows={table[0].data.rows} //table[0].data.rows
             columns={table[0].data.columns} //table[0].data.columns
+            onCellEditCommit={handleCellEditCommit}
             hideFooterSelectedRowCount
+            IsReadOnly="True"
           />
         </div>
       ) : (

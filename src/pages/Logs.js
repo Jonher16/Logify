@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { db } from "../firebase";
 import Log from "../components/Log";
 import { makeStyles, Typography } from "@material-ui/core";
+import nuuk from "../images/nuuk.png"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -71,6 +72,7 @@ const Logs = () => {
 
   return (
     <div className={classes.root}>
+      <img style={{height:"60px", width: "150px", position: "absolute", zindex: 999, right:"2vw", top: "2vh"}} src={nuuk} alt="nuuk"></img>
       <Link to="/">
         <img src={back} className={classes.back} alt="back_button" />
       </Link>
