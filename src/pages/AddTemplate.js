@@ -1,10 +1,10 @@
 import { Button, IconButton, makeStyles, TextField, Typography } from "@material-ui/core";
-import { DataGrid } from "@mui/x-data-grid";
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import back from "../images/back.png";
 import DeleteIcon from '@material-ui/icons/Delete';
 import { db } from "../firebase";
+import nuuk from "../images/nuuk.png"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -220,6 +220,7 @@ const AddTemplate = () => {
 
   return (
     <div className={classes.root}>
+      <img style={{height:"60px", width: "150px", position: "absolute", zindex: 999, right:"2vw", top: "2vh"}} src={nuuk} alt="nuuk"></img>
       <Link to="/">
         <img src={back} className={classes.back} alt="back_button" />
       </Link>
@@ -259,6 +260,7 @@ const AddTemplate = () => {
               columns.map((column) => (
                 (column.field !== " ") && <div className={classes.mapitem}>
                   <Typography>{column.headerName}</Typography>
+                  
                   <IconButton className={classes.binicon}>
                   <DeleteIcon onClick={(e)=>handleDeleteColumn(e, column)}/>
                   </IconButton>

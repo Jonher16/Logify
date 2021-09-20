@@ -3,10 +3,6 @@ import {
   TextField,
   Typography,
   Button,
-  Checkbox,
-  FormControl,
-  InputLabel,
-  Select,
   MenuItem,
   IconButton,
   Card,
@@ -15,9 +11,9 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import back from "../images/back.png";
 import { db } from "../firebase";
-import firebase from "firebase";
 import { DataGrid } from "@mui/x-data-grid";
 import DeleteIcon from "@material-ui/icons/Delete"
+import nuuk from "../images/nuuk.png"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -169,9 +165,10 @@ const AddLog = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    let columnsWithoutEdit = columns.map(column=>{column.editable = false; return column})
     db.collection("tables").add({
       title: title,
-      columns: columns,
+      columns: columnsWithoutEdit,
       rows: rows,
     });
     alert("Table submitted succesfully");
@@ -188,9 +185,9 @@ const AddLog = () => {
     }
     else alert("Template was not deleted")
      }
-
   return (
     <div className={classes.root}>
+      <img style={{height:"60px", width: "150px", position: "absolute", zindex: 999, right:"2vw", top: "2vh"}} src={nuuk} alt="nuuk"></img>
       <Link to="/">
         <img src={back} className={classes.back} alt="back_button" />
       </Link>
