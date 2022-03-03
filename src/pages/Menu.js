@@ -96,7 +96,6 @@ const Menu = () => {
   const classes = useStyles();
   return (
     <div className={classes.root}>
-      <img style={{height:"60px", width: "150px", position: "absolute", zindex: 999, right:"2vw", top: "2vh"}} src={nuuk} alt="nuuk"></img>
       <div className={classes.title}>
         <Typography className={classes.title__text}>Logify</Typography>
       </div>
